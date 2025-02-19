@@ -187,6 +187,8 @@ spec:
       app: recommendationservice
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
         app: recommendationservice
     spec:
@@ -740,9 +742,9 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend:80"
         - name: USERS
-          value: "10"
+          value: "100"
         - name: RATE
-          value: "1"
+          value: "10"
         resources:
           requests:
             cpu: 300m
@@ -915,6 +917,8 @@ spec:
       app: adservice
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: adservice
     spec:

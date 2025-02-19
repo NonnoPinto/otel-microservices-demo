@@ -1,0 +1,35 @@
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: auto-instrumentation
+  labels: 
+    app: otel-auto-instrumentation
+spec:
+  exporter:
+    endpoint: host.k3d.internal:4318
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
+  python:
+    env:
+      - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
+        value: 'true'
+      - name: COLLECTOR_SERVICE_ADDR
+        value: "host.k3d.internal:4318"
+      - name: OTEL_SERVICE_NAME
+        value: "recommendationservice"
+      - name: ENABLE_TRACING
+        value: "1"
+  java:
+    env:
+      - name: COLLECTOR_SERVICE_ADDR
+        value: "host.k3d.internal:4318"
+      - name: OTEL_SERVICE_NAME
+        value: "adservice"
+      - name: ENABLE_TRACING
+        value: "1"
+  
