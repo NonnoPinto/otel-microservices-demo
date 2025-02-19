@@ -187,6 +187,8 @@ spec:
       app: recommendationservice
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
       labels:
         app: recommendationservice
     spec:
@@ -915,6 +917,8 @@ spec:
       app: adservice
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: adservice
     spec:

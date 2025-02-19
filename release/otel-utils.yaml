@@ -7,7 +7,7 @@ metadata:
     app: otel-auto-instrumentation
 spec:
   exporter:
-    endpoint: host.k3d.internal:4318
+    endpoint: 172.29.92.175:4317
   propagators:
     - tracecontext
     - baggage
@@ -19,17 +19,29 @@ spec:
       - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
         value: 'true'
       - name: COLLECTOR_SERVICE_ADDR
-        value: "host.k3d.internal:4318"
+        value: "http://172.29.92.175:4318"
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://172.29.92.175:4318"
       - name: OTEL_SERVICE_NAME
         value: "recommendationservice"
       - name: ENABLE_TRACING
         value: "1"
+      - name: ENABLE_LOGGING
+        value: "1"
+      - name: ENABLE_PROFILER
+        value: "0"
   java:
     env:
       - name: COLLECTOR_SERVICE_ADDR
-        value: "host.k3d.internal:4318"
+        value: "http://172.29.92.175:4317"
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://172.29.92.175:4317"
       - name: OTEL_SERVICE_NAME
         value: "adservice"
       - name: ENABLE_TRACING
         value: "1"
+      - name: ENABLE_LOGGING
+        value: "1"
+      - name: ENABLE_PROFILER
+        value: "0"
   
