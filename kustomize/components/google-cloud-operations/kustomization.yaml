@@ -2,7 +2,27 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 patches:
 # adservice - auto instrumentation
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: adservice
+    spec:
+      template:
+        metadata:
+          annotations:
+            instrumentation.opentelemetry.io/inject-java: "true"
 # recommendationservice - auto instrumentation
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: recommendationservice
+    spec:
+      template:
+        metadata:
+          annotations:
+            instrumentation.opentelemetry.io/inject-python: "true"
 # checkoutservice - tracing, profiler
 - patch: |-
     apiVersion: apps/v1
@@ -21,6 +41,8 @@ patches:
                 value: "checkoutservice"
               - name: ENABLE_TRACING
                 value: "1"
+              - name: ENABLE_LOGGING
+                value: "0"
               - name: ENABLE_PROFILER
                 value: "0"
 # currencyservice - tracing, profiler
@@ -41,6 +63,8 @@ patches:
                 value: "currencyservice"
               - name: ENABLE_TRACING
                 value: "1"
+              - name: ENABLE_LOGGING
+                value: "0"
               - name: DISABLE_PROFILER
                 value: "1"
 # emailservice - tracing, profiler
@@ -61,6 +85,8 @@ patches:
                 value: "emailservice"
               - name: ENABLE_TRACING
                 value: "1"
+              - name: ENABLE_LOGGING
+                value: "0"
               - name: DISABLE_PROFILER
                 value: "1"
 # frontend - tracing, profiler
@@ -81,6 +107,8 @@ patches:
                 value: "frontend"
               - name: ENABLE_TRACING
                 value: "1"
+              - name: ENABLE_LOGGING
+                value: "0"
               - name: ENABLE_PROFILER
                 value: "0"
 # paymentservice - tracing, profiler
@@ -101,6 +129,8 @@ patches:
                 value: "paymentservice"
               - name: ENABLE_TRACING
                 value: "1"
+              - name: ENABLE_LOGGING
+                value: "0"
               - name: DISABLE_PROFILER
                 value: "1"
 # productcatalogservice - tracing, profiler
@@ -121,5 +151,7 @@ patches:
                 value: "productcatalogservice"
               - name: ENABLE_TRACING
                 value: "1"
+              - name: ENABLE_LOGGING
+                value: "0"
               - name: DISABLE_PROFILER
                 value: "1"
