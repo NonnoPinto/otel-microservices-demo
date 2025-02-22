@@ -6,7 +6,7 @@
 
 ## Online boutique with OTel Collector outside cluster
 In this repo i made some sligth changes to `\kustomize\components\google-cloud-operations` to be able to inject [OTel kubernetes operator](https://opentelemetry.io/docs/platforms/kubernetes/operator/automatic/) in `adservice` (Java) ad `recommendationservice` (Python). Everything is sent to an OTel collector OUTSIDE the cluster, then to a few different backend.
-### How to test it
+### How to run it locally
 First, you need to start the collector (with this command you will save all the logs to a txt file).
 ```sh
 nohup otelcol-contrib --config \kustomize\components\google-cloud-operations\otel-collector-config.yaml > collector.log 2>&1
@@ -87,7 +87,7 @@ Then install the services.
 ```sh
 kubectl apply -f ./release/kubernetes-manifests.yaml
 ```
-Check [localhost:8081](localhost:8081), the app should be up!
+Check [localhost:8081](http://localhost:8081), the app should be up!
 
 
 (Optional) Check if the operator succesfully injected the auto instrumentation in `adservice` and `recommendationservice`.
