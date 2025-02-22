@@ -16,8 +16,6 @@ spec:
     argument: "1"
   python:
     env:
-      - name: COLLECTOR_SERVICE_ADDR
-        value: "http://172.29.92.175:4318"
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
         value: "http://172.29.92.175:4318"
       - name: OTEL_SERVICE_NAME
@@ -25,13 +23,11 @@ spec:
       - name: ENABLE_TRACING
         value: "1"
       - name: ENABLE_LOGGING
-        value: "0"
+        value: "1"
       - name: ENABLE_PROFILER
         value: "0"
   java:
     env:
-      - name: COLLECTOR_SERVICE_ADDR
-        value: "http://172.29.92.175:4317"
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
         value: "http://172.29.92.175:4317"
       - name: OTEL_SERVICE_NAME
@@ -39,7 +35,7 @@ spec:
       - name: ENABLE_TRACING
         value: "1"
       - name: ENABLE_LOGGING
-        value: "0"
+        value: "1"
       - name: ENABLE_PROFILER
         value: "0"
   
