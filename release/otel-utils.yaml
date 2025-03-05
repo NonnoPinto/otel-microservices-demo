@@ -22,8 +22,8 @@ spec:
         value: "recommendationservice"
       - name: ENABLE_TRACING
         value: "1"
-      - name: ENABLE_LOGGING
-        value: "1"
+      - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
+        value: "true"
       - name: ENABLE_PROFILER
         value: "0"
   java:
@@ -34,8 +34,10 @@ spec:
         value: "adservice"
       - name: ENABLE_TRACING
         value: "1"
-      - name: ENABLE_LOGGING
-        value: "1"
+      - name: OTEL_JAVAAGENT_LOGGING
+        value: "true"
       - name: ENABLE_PROFILER
         value: "0"
+      - name: OTEL_RESOURCE_PROVIDERS_GCP_ENABLED
+        value: "true"
   

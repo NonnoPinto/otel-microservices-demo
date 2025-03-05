@@ -1,4 +1,4 @@
-# [START gke_release_kubernetes_manifests_microservices_demo]
+# Admin account for kubernetes dashboard
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -27,9 +27,154 @@ subjects:
   - kind: ServiceAccount
     name: admin-user
     namespace: kubernetes-dashboard
-  - kind: ServiceAccount
-    name: otel-collector
-    namespace: default
+---
+# Cluster metric collector
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otelcontribcol
+  labels:
+    app: otelcontribcol
+data:
+  config.yaml: |
+    receivers:
+      k8s_cluster:
+        collection_interval: 10s
+    exporters:
+      debug:
+      otlp/ext:
+        endpoint: "http://172.29.92.175:4317"
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        metrics:
+          receivers: [k8s_cluster]
+          exporters: [otlp/ext, debug]
+---
+# User to export Cluster metrics
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: otelcontribcol
+  name: otelcontribcol
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otelcontribcol
+  labels:
+    app: otelcontribcol
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  - namespaces
+  - namespaces/status
+  - nodes
+  - nodes/spec
+  - pods
+  - pods/status
+  - replicationcontrollers
+  - replicationcontrollers/status
+  - resourcequotas
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otelcontribcol
+  labels:
+    app: otelcontribcol
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otelcontribcol
+subjects:
+- kind: ServiceAccount
+  name: otelcontribcol
+  namespace: default
+---
+# Services
+# otel collector
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otelcontribcol
+  labels:
+    app: otelcontribcol
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otelcontribcol
+  template:
+    metadata:
+      labels:
+        app: otelcontribcol
+    spec:
+      serviceAccountName: otelcontribcol
+      containers:
+      - name: otelcontribcol
+        image: otel/opentelemetry-collector-contrib
+        args: ["--config", "/etc/config/config.yaml"]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+      volumes:
+        - name: config
+          configMap:
+            name: otelcontribcol
+# emailservice
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -106,6 +251,7 @@ kind: ServiceAccount
 metadata:
   name: emailservice
 ---
+# checkoutservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -188,6 +334,7 @@ kind: ServiceAccount
 metadata:
   name: checkoutservice
 ---
+# recommendationservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -237,6 +384,8 @@ spec:
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: "productcatalogservice:3550"
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: ""
         resources:
           requests:
             cpu: 100m
@@ -265,6 +414,7 @@ kind: ServiceAccount
 metadata:
   name: recommendationservice
 ---
+# frontend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -393,6 +543,7 @@ kind: ServiceAccount
 metadata:
   name: frontend
 ---
+# paymentservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -466,6 +617,7 @@ kind: ServiceAccount
 metadata:
   name: paymentservice
 ---
+# productcatalogservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -539,6 +691,7 @@ kind: ServiceAccount
 metadata:
   name: productcatalogservice
 ---
+# cartservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -613,6 +766,7 @@ kind: ServiceAccount
 metadata:
   name: cartservice
 ---
+# redis-cart
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -682,6 +836,7 @@ spec:
     port: 6379
     targetPort: 6379
 ---
+# loadgenerator
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -769,6 +924,7 @@ kind: ServiceAccount
 metadata:
   name: loadgenerator
 ---
+# currencyservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -843,6 +999,7 @@ kind: ServiceAccount
 metadata:
   name: currencyservice
 ---
+# shippingservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -916,6 +1073,7 @@ kind: ServiceAccount
 metadata:
   name: shippingservice
 ---
+# adservice
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -992,4 +1150,3 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: adservice
-# [END gke_release_kubernetes_manifests_microservices_demo]
